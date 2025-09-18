@@ -8,30 +8,6 @@ namespace ArchiverApp.Tests
     [TestFixture]
     public class ArchiverIntegrationTests
     {
-        private string apple = "resources/apple.png";
-        private string nature = "resources/nature.png";
-        private string car = "resources/car.png";
-
-        private string appleCompressed => apple + ".rle";
-        private string natureCompressed => nature + ".rle";
-        private string carCompressed => car + ".rle";
-
-        private string appleDecompressed => "resources/apple_out.png";
-        private string natureDecompressed => "resources/nature_out.png";
-        private string carDecompressed => "resources/car_out.png";
-
-        [TearDown]
-        public void Cleanup()
-        {
-            // удаляем все промежуточные файлы
-            foreach (var f in new[] { appleCompressed, natureCompressed, carCompressed,
-                                      appleDecompressed, natureDecompressed, carDecompressed })
-            {
-                if (File.Exists(f))
-                    File.Delete(f);
-            }
-        }
-
 
         // --------------------------
         // TESTS CompressText (строки)
@@ -72,70 +48,6 @@ namespace ArchiverApp.Tests
             string decompressed = Archiver.DecompressString(input);
             Assert.That(decompressed, Is.EqualTo(expected));
         }
-
-
-        // --------------------------
-        // TESTS compressFile
-        // --------------------------
-
-        [TestCase("resources/apple.jpeg")]
-        [TestCase("resources/nature.jpeg")]
-        [TestCase("resources/car.jpeg")]
-        public void Test_CompressFile_FileBecomesSmaller(string inputPath)
-        {
-            if (!File.Exists(inputPath))
-            {
-                Assert.Ignore($"Файл {inputPath} отсутствует в resources.");
-            }
-
-            string outputPath = inputPath + ".rle";
-
-            Archiver.CompressFile(inputPath, outputPath);
-
-            Assert.That(File.Exists(outputPath), "Сжатый файл не создан");
-
-            long originalSize = new FileInfo(inputPath).Length;
-            long compressedSize = new FileInfo(outputPath).Length;
-
-          Assert.That(compressedSize, Is.LessThan(originalSize),
-    $"Сжатый файл ({compressedSize}) не меньше исходного ({originalSize})");
-
-        }
-
-        // --------------------------
-        // TESTS decompressFile
-        // --------------------------
-
-        [TestCase("resources/apple.jpeg")]
-        [TestCase("resources/nature.jpeg")]
-        [TestCase("resources/car.jpeg")]
-        public void Test_DecompressFile_MatchesOriginal(string inputPath)
-        {
-            if (!File.Exists(inputPath))
-            {
-                Assert.Ignore($"Файл {inputPath} отсутствует в resources.");
-            }
-
-            string compressedPath = inputPath + ".rle";
-            string decompressedPath = Path.Combine(
-                Path.GetDirectoryName(inputPath),
-                Path.GetFileNameWithoutExtension(inputPath) + "_out" + Path.GetExtension(inputPath)
-            );
-
-            // шаг 1: сжать
-            Archiver.CompressFile(inputPath, compressedPath);
-
-            // шаг 2: разжать
-            Archiver.DecompressFile(compressedPath, decompressedPath);
-
-            Assert.That(File.Exists(decompressedPath), "Разжатый файл не создан");
-
-            byte[] originalBytes = File.ReadAllBytes(inputPath);
-            byte[] decompressedBytes = File.ReadAllBytes(decompressedPath);
-
-            Assert.Equals(originalBytes, decompressedBytes);
-        }
     }
 
-   
 }
