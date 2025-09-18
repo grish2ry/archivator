@@ -11,8 +11,6 @@ public static class Archiver
     /// Текущая реализация не удовлетворяет всем тестам
     /// Также требуется использовать метод WriteRun для записи в outputLine и заменить тип string на StringBuilder.
     /// Пример: "aaabb" → "3a2b"
-    /// Пример: "2\\2a" → "\\aa"
-    /// Пример: "44455" → "3\42\5"
     /// Пример: "aabccc"   → "2ab3c"
     /// </summary>
 
@@ -61,9 +59,8 @@ public static class Archiver
     /// <summary>
     /// Заглушка: должна разжимать строку, сжатую методом RLE.
     /// Пример: "3a2b" → "aaabb"
-    /// Пример: "\\aa" → "2\\2a"
-    /// Пример: "3\42\5" → "44455"
     /// Пример: "2ab3c"   → "aabccc"
+    /// Важно: при экранирова
     /// </summary>
     public static string DecompressString(string compressed)
     {
@@ -73,8 +70,6 @@ public static class Archiver
     /// <summary>
     /// Заглушка: должна записывать (count, symbol) в выходной буфер.
     /// Пример: count=3, symbol='a' → "3a"
-    /// Пример: count=2, symbol='\' → "2\\"
-    /// Пример: count=3, symbol='3' → "3\3"
     /// Пример: count=1, symbol='b' → "b"
     /// </summary>
     public static void WriteRun(StringBuilder output, char symbol, int count)
