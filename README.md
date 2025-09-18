@@ -69,3 +69,9 @@ throw new NotImplementedException("implement me");
 dotnet test Archiver.csproj
 ```
 
+---
+
+## 📚 Дополнительные материалы
+
+- [Run-Length Encoding (wiki)](https://ru.wikipedia.org/wiki/Кодирование_длин_серий)
+
