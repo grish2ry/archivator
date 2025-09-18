@@ -50,7 +50,7 @@ namespace ArchiverApp.Tests
         public void Test_CompressText_String(string input, string expectedPrefix)
         {
             string compressed = Archiver.CompressString(input);
-            Assert.That(compressed, Does.Match(expectedPrefix));
+            Assert.That(compressed, Is.EqualTo(expectedPrefix));
         }
 
         // --------------------------
@@ -69,8 +69,8 @@ namespace ArchiverApp.Tests
         [TestCase("xyz", "xyz")]
         public void Test_DecompressString_String(string input, string expected)
         {
-            string decompressed = Archiver.CompressString(input);
-            Assert.That(decompressed, Does.Match(expected));
+            string decompressed = Archiver.DecompressString(input);
+            Assert.That(decompressed, Is.EqualTo(expected));
         }
 
 
