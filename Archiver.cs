@@ -76,22 +76,5 @@ public static class Archiver
     {
         throw new NotImplementedException("implement me");
     }
-
-    /// <summary>
-    /// Сжать файл и сохранить результат в outputPath.
-    /// Подсказка: использовать File.ReadAllText(inputPath) и File.WriteAllText(outputPath, CompressText(...))
-    /// </summary>
-    public static void CompressFile(string inputPath, string outputPath)
-    {
-        throw new NotImplementedException("implement me");
-    }
-
-    /// <summary>
-    /// Разжать файл и сохранить результат в outputPath.
-    /// Подсказка: использовать File.ReadAllText(inputPath) и File.WriteAllText(outputPath, decompressString(...))
-    /// </summary>
-    public static void DecompressFile(string inputPath, string outputPath)
-    {
-        throw new NotImplementedException("implement me");
-    }
+    
 }
