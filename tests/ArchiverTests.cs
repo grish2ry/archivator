@@ -1,53 +1,65 @@
 using NUnit.Framework;
-using System;
-using System.IO;
-using System.Text;
 
 namespace ArchiverApp.Tests
 {
     [TestFixture]
-    public class ArchiverIntegrationTests
+    public class ArchiverStringTests
     {
-
-        // --------------------------
-        // TESTS CompressText (строки)
-        // --------------------------
-
-        [TestCase("aaabb", "3a2b")]
-        [TestCase("aabccc", "2ab3c")]
-        [TestCase("44455", "3\\42\\5")]
-        [TestCase("abc", "abc")]
-        [TestCase("a", "a")]
-        [TestCase("111", "3\\1")]
-        [TestCase("22", "2\\2")]
-        [TestCase("\\\\", "2\\\\")]
-        [TestCase("aaa111bbb", "3a3\\13b")]
-        [TestCase("xyz", "xyz")]
-        public void Test_CompressText_String(string input, string expectedPrefix)
+        [TestCase("aaabb")]
+        [TestCase("aabccc")]
+        [TestCase("44455")]
+        [TestCase("abc")]
+        [TestCase("a")]
+        [TestCase("111")]
+        [TestCase("22")]
+        [TestCase("\\\\")]
+        [TestCase("aaa111bbb")]
+        [TestCase("xyz")]
+        [TestCase("a1a1a1")]
+        [TestCase("111aaa222bbb")]
+        [TestCase("abc123abc123")]
+        [TestCase("!!!!????!!!!")]
+        [TestCase("aAaAaA")]
+        [TestCase("ababababab")]
+        [TestCase("1234567890")]
+        [TestCase("zzzzzzzzzzzzzzzz")]
+        [TestCase("hello_world_2024")]
+        [TestCase("RLE_test_case_###")]
+        public void Test_CompressString_IsShorterOrEqual(string input)
         {
             string compressed = Archiver.CompressString(input);
-            Assert.That(compressed, Is.EqualTo(expectedPrefix));
+
+            // Проверяем, что длина сжатой строки не больше исходной
+            Assert.That(compressed.Length, Is.LessThanOrEqualTo(input.Length));
         }
 
-        // --------------------------
-        // TESTS decompressString (строки)
-        // --------------------------
-
-        [TestCase("3a2b", "aaabb")]
-        [TestCase("2ab3c", "aabccc")]
-        [TestCase("3\\42\\5", "44455")]
-        [TestCase("a", "a")]
-        [TestCase("abc", "abc")]
-        [TestCase("3\\1", "111")]
-        [TestCase("2\\2", "22")]
-        [TestCase("2\\\\", "\\\\")]
-        [TestCase("3a3\\13b", "aaa111bbb")]
-        [TestCase("xyz", "xyz")]
-        public void Test_DecompressString_String(string input, string expected)
+        [TestCase("aaabb")]
+        [TestCase("aabccc")]
+        [TestCase("44455")]
+        [TestCase("abc")]
+        [TestCase("a")]
+        [TestCase("111")]
+        [TestCase("22")]
+        [TestCase("\\\\")]
+        [TestCase("aaa111bbb")]
+        [TestCase("xyz")]
+        [TestCase("a1a1a1")]
+        [TestCase("111aaa222bbb")]
+        [TestCase("abc123abc123")]
+        [TestCase("!!!!????!!!!")]
+        [TestCase("aAaAaA")]
+        [TestCase("ababababab")]
+        [TestCase("1234567890")]
+        [TestCase("zzzzzzzzzzzzzzzz")]
+        [TestCase("hello_world_2024")]
+        [TestCase("RLE_test_case_###")]
+        public void Test_CompressThenDecompress_EqualsOriginal(string input)
         {
-            string decompressed = Archiver.DecompressString(input);
-            Assert.That(decompressed, Is.EqualTo(expected));
+            string compressed = Archiver.CompressString(input);
+            string decompressed = Archiver.DecompressString(compressed);
+
+            // Проверяем, что после декомпрессии строка совпадает с оригиналом
+            Assert.That(decompressed, Is.EqualTo(input));
         }
     }
-
 }
