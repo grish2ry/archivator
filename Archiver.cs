@@ -4,8 +4,6 @@ namespace ArchiverApp;
 
 public static class Archiver
 {
-
-
     /// <summary>
     /// Должна сжимать строку методом RLE.
     /// Текущая реализация не удовлетворяет всем тестам
@@ -13,60 +11,93 @@ public static class Archiver
     /// Пример: "aaabb" → "3a2b"
     /// Пример: "aabccc"   → "2ab3c"
     /// </summary>
-
     public static string CompressString(string inputLine)
     {
-        char? lastC = null;
-        int curCnt = 0;
-        string outputLine = "";
-        foreach (char c in inputLine)
+        int count = 1;
+        char lastChar = inputLine[0];
+        var outputLine = new StringBuilder("");
+        inputLine += "\0";
+        for (int i = 1; i < inputLine.Length; i++)
         {
-            if (lastC == null)
+            if ((int)lastChar <= 57 && (int)lastChar >= 48 && inputLine[i] != lastChar)
             {
-                lastC = c;
-                curCnt = 1;
-                continue;
+                if (count > 1)
+                    outputLine.AppendFormat("{0}{1}\\", count, lastChar);
+                else
+                    outputLine.AppendFormat("{0}\\", lastChar);
+
+                count = 1;
             }
-            if (c != lastC)
+            else
             {
-                if (Char.IsDigit((char)lastC) && lastC != '\\')
+
+                if (inputLine[i] == lastChar)
                 {
-                    outputLine += String.Format("{0}\\{1}", curCnt, lastC);
+                    count++;
+                }
+                else if (count > 1)
+                {
+                    outputLine.AppendFormat("{0}{1}", count, lastChar);
+                    count = 1;
                 }
                 else
                 {
-                    outputLine += String.Format("{0}{1}", curCnt, lastC);
+                    outputLine.Append(lastChar);
                 }
-                curCnt = 1;
-                lastC = c;
-                continue;
             }
-            curCnt += 1;
+            lastChar = inputLine[i];
         }
-
-        if (Char.IsDigit((char)lastC) && lastC != '\\')
-        {
-            outputLine += String.Format("{0}\\{1}", curCnt, lastC);
-        }
-        else
-        {
-            outputLine += String.Format("{0}{1}", curCnt, lastC);
-        }
-
-        return outputLine;
+        return outputLine.ToString();
     }
-
     /// <summary>
     /// Заглушка: должна разжимать строку, сжатую методом RLE.
     /// Пример: "3a2b" → "aaabb"
     /// Пример: "2ab3c"   → "aabccc"
     /// Важно: при экранирова
     /// </summary>
-    public static string DecompressString(string compressed)
+    public static string DecompressString(string inputLine)
     {
-        throw new NotImplementedException("implement me");
-    }
+        var outputLine = new StringBuilder("");
+        inputLine += "\0";
+        char lastChar = inputLine[0];
+        int i = 1;
+        while (i < inputLine.Length)
+        {
+            if (((int)lastChar <= 57 && (int)lastChar >= 48))
+            {
+                var number = new StringBuilder("").Append(lastChar);
+                while ((int)inputLine[i] <= 57 && (int)inputLine[i] >= 48)
+                {
+                    lastChar = inputLine[i];
+                    number.Append(inputLine[i]);
+                    i++;
+                }
+                if (! (inputLine[i]=='\\'))
+                {
+                    WriteRun(outputLine, inputLine[i], Convert.ToInt32(number.ToString()));
+                    lastChar = inputLine[i + 1];
+                    i += 2;
+                }
+                else
+                {
+                    number.Remove(number.Length - 1, 1);
+                    int count_of_number = number.Length > 0 ? Convert.ToInt32(number.ToString()) : 1;
+                    WriteRun(outputLine, inputLine[i - 1], count_of_number);
+                    lastChar = inputLine[i + 1];
+                    i += 2;
+                }
+            }
+            else
+            {
+                outputLine.Append(lastChar);
+                lastChar = inputLine[i];
+                i++;
 
+            }
+        }
+        return outputLine.ToString();
+
+    }
     /// <summary>
     /// Заглушка: должна записывать (count, symbol) в выходной буфер.
     /// Пример: count=3, symbol='a' → "3a"
@@ -74,7 +105,15 @@ public static class Archiver
     /// </summary>
     public static void WriteRun(StringBuilder output, char symbol, int count)
     {
-        throw new NotImplementedException("implement me");
+        for(int i = 0; i < count; i++)
+            output.Append(symbol);
     }
-    
 }
+
+
+
+
+
+
+
+
