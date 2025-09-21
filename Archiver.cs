@@ -1,5 +1,5 @@
 ﻿using System.Text;
-
+using System.Net;
 namespace ArchiverApp;
 
 public static class Archiver
@@ -13,40 +13,23 @@ public static class Archiver
     /// </summary>
     public static string CompressString(string inputLine)
     {
-        int count = 1;
-        char lastChar = inputLine[0];
         var outputLine = new StringBuilder("");
         inputLine += "\0";
+        char lastChar = inputLine[0];
+        int count = 1;
         for (int i = 1; i < inputLine.Length; i++)
         {
-            if ((int)lastChar <= 57 && (int)lastChar >= 48 && inputLine[i] != lastChar)
-            {
-                if (count > 1)
-                    outputLine.AppendFormat("{0}{1}\\", count, lastChar);
-                else
-                    outputLine.AppendFormat("{0}\\", lastChar);
+            if (inputLine[i] == lastChar)
+                count++;
 
+            else { 
+                WriteRun(outputLine, lastChar, count);
                 count = 1;
             }
-            else
-            {
-
-                if (inputLine[i] == lastChar)
-                {
-                    count++;
-                }
-                else if (count > 1)
-                {
-                    outputLine.AppendFormat("{0}{1}", count, lastChar);
-                    count = 1;
-                }
-                else
-                {
-                    outputLine.Append(lastChar);
-                }
-            }
             lastChar = inputLine[i];
+            
         }
+
         return outputLine.ToString();
     }
     /// <summary>
@@ -63,10 +46,10 @@ public static class Archiver
         int i = 1;
         while (i < inputLine.Length)
         {
-            if (((int)lastChar <= 57 && (int)lastChar >= 48))
+            if (char.IsNumber(lastChar))
             {
                 var number = new StringBuilder("").Append(lastChar);
-                while ((int)inputLine[i] <= 57 && (int)inputLine[i] >= 48)
+                while (char.IsNumber(inputLine[i]))
                 {
                     lastChar = inputLine[i];
                     number.Append(inputLine[i]);
@@ -74,7 +57,7 @@ public static class Archiver
                 }
                 if (! (inputLine[i]=='\\'))
                 {
-                    WriteRun(outputLine, inputLine[i], Convert.ToInt32(number.ToString()));
+                    Append_many(outputLine, inputLine[i], Convert.ToInt32(number.ToString()));
                     lastChar = inputLine[i + 1];
                     i += 2;
                 }
@@ -82,7 +65,7 @@ public static class Archiver
                 {
                     number.Remove(number.Length - 1, 1);
                     int count_of_number = number.Length > 0 ? Convert.ToInt32(number.ToString()) : 1;
-                    WriteRun(outputLine, inputLine[i - 1], count_of_number);
+                    Append_many(outputLine, inputLine[i - 1], count_of_number);
                     lastChar = inputLine[i + 1];
                     i += 2;
                 }
@@ -103,10 +86,18 @@ public static class Archiver
     /// Пример: count=3, symbol='a' → "3a"
     /// Пример: count=1, symbol='b' → "b"
     /// </summary>
+    public static void Append_many(StringBuilder output, char symbol, int count)
+    {
+        for (int i = 0; i < count; i++)
+            output.Append(symbol);
+    }
     public static void WriteRun(StringBuilder output, char symbol, int count)
     {
-        for(int i = 0; i < count; i++)
-            output.Append(symbol);
+        if (count > 1)
+            output.AppendFormat("{0}{1}{2}", count, symbol, char.IsNumber(symbol) ? '\\' : '\0');
+        else
+            output.AppendFormat("{0}{1}", symbol, char.IsNumber(symbol) ? '\\' : '\0');
+        
     }
 }
 
